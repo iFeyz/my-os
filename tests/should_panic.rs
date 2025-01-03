@@ -1,10 +1,10 @@
-#![no_std]
-#![no_main]
-#![feature(custom_test_frameworks)]
-#![test_runner(test_runner)]
-#![reexport_test_harness_main = "test_main"]
+#![no_std] // Pas de bibliothèque standard
+#![no_main] // Pas de fonction standard d'entrée main
+#![feature(custom_test_frameworks)] // Utilisation du framework de test personnalisé
+#![test_runner(test_runner)] // Définition de la fonction test_runner comme fonction de test
+#![reexport_test_harness_main = "test_main"] // Réexportation de la fonction test_main
 
-use blog_os::{exit_qemu, serial_print, serial_println, QemuExitCode};
+use blog_os::{exit_qemu, serial_print, serial_println, QemuExitCode, Testable, test_runner};
 use core::panic::PanicInfo;
 
 #[no_mangle]
@@ -13,29 +13,6 @@ pub extern "C" fn _start() -> ! {
     serial_println!("[test did not panic]");
     exit_qemu(QemuExitCode::Failed);
     loop {}
-}
-
-pub trait Testable {
-    fn run(&self);
-}
-
-impl<T> Testable for T
-where
-    T: Fn(),
-{
-    fn run(&self) {
-        serial_print!("{}...\t", core::any::type_name::<T>());
-        self();
-        serial_println!("[ok]");
-    }
-}
-
-pub fn test_runner(tests: &[&dyn Testable]) {
-    serial_println!("Running {} tests", tests.len());
-    for test in tests {
-        test.run();
-    }
-    exit_qemu(QemuExitCode::Success);
 }
 
 fn should_fail() {
