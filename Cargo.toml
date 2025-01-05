@@ -13,11 +13,12 @@ volatile = "0.2.6"
 spin = "0.5.2"
 x86_64 = "0.14.2"
 uart_16550 = "0.2.0"
+pic8259 = "0.10.1"
 
 [[test]]
-name = "should_panic"
-
+name = "stack_overflow"
 harness = false
+
 
 [dependencies.lazy_static]
 version = "1.0"
