@@ -5,11 +5,13 @@
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 
+extern crate alloc;
+pub mod memory;
 pub mod serial;
 pub mod vga_buffer;
 pub mod gdt;
 pub mod interrupts;
-
+pub mod allocator;
 use crate::vga_buffer::{WRITER, BUFFER_HEIGHT};
 use core::panic::PanicInfo;
 
@@ -84,6 +86,19 @@ pub extern "C" fn _start() -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     test_panic_handler(info)
+}
+
+#[cfg(test)]
+use bootloader::{entry_point , BootInfo};
+
+#[cfg(test)]
+entry_point!(test_kernel_main);
+
+#[cfg(test)]
+fn test_kernel_main(_boot_info : &'static BootInfo) -> ! {
+ init();
+ test_main();
+ hlt_loop();
 }
 
 #[test_case]
